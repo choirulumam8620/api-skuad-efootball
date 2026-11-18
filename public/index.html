@@ -27,9 +27,34 @@
       }
       ul {
         padding-left: 20px;
+        margin-bottom: 20px;
       }
       li {
         margin: 8px 0;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+      }
+      input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #f8fafc;
+      }
+      button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 6px;
+        background: #38bdf8;
+        color: #0f172a;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #7dd3fc;
       }
     </style>
   </head>
@@ -40,21 +65,53 @@
       <p><strong>Formasi:</strong> <span id="formasi">Memuat...</span></p>
       <p><strong>Pemain Kunci:</strong></p>
       <ul id="pemain"></ul>
+
+      <form id="form-pemain">
+        <input
+          type="text"
+          id="input-nama"
+          placeholder="Nama pemain baru..."
+          required
+        />
+        <button type="submit">Tambah</button>
+      </form>
     </div>
 
     <script>
-      fetch("/skuad")
-        .then((res) => res.json())
-        .then((data) => {
-          document.getElementById("manajer").textContent = data.manajer;
-          document.getElementById("formasi").textContent = data.formasi;
-          const list = document.getElementById("pemain");
-          data.pemainKunci.forEach((nama) => {
-            const li = document.createElement("li");
-            li.textContent = nama;
-            list.appendChild(li);
+      function muatSkuad() {
+        fetch("/skuad")
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("manajer").textContent = data.manajer;
+            document.getElementById("formasi").textContent = data.formasi;
+            const list = document.getElementById("pemain");
+            list.innerHTML = "";
+            data.pemainKunci.forEach((nama) => {
+              const li = document.createElement("li");
+              li.textContent = nama;
+              list.appendChild(li);
+            });
+          });
+      }
+
+      document
+        .getElementById("form-pemain")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const input = document.getElementById("input-nama");
+          fetch("/pemain", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nama: input.value }),
+          }).then((res) => {
+            if (res.ok) {
+              input.value = "";
+              muatSkuad();
+            }
           });
         });
+
+      muatSkuad();
     </script>
   </body>
 </html>
