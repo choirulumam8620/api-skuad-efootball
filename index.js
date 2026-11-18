@@ -4,10 +4,13 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
-const FILE_DATA = path.join(__dirname, "skuad.json");
+const FILE_AWAL = path.join(__dirname, "skuad.json");
+const FILE_DATA = process.env.VERCEL
+  ? path.join("/tmp", "skuad.json")
+  : FILE_AWAL;
 
 const dataAwal = {
   manajer: "Antonio Conte",
@@ -17,8 +20,12 @@ const dataAwal = {
 
 function bacaSkuad() {
   if (!fs.existsSync(FILE_DATA)) {
-    fs.writeFileSync(FILE_DATA, JSON.stringify(dataAwal, null, 2));
-    return dataAwal;
+    let sumberData = dataAwal;
+    if (FILE_DATA !== FILE_AWAL && fs.existsSync(FILE_AWAL)) {
+      sumberData = JSON.parse(fs.readFileSync(FILE_AWAL, "utf-8"));
+    }
+    fs.writeFileSync(FILE_DATA, JSON.stringify(sumberData, null, 2));
+    return sumberData;
   }
   const isi = fs.readFileSync(FILE_DATA, "utf-8");
   return JSON.parse(isi);
@@ -61,6 +68,10 @@ app.delete("/pemain/:nama", (req, res) => {
   res.json({ pesan: "Pemain berhasil dihapus", skuad });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server berjalan di http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
