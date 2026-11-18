@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skuad eFootball</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #0f172a;
+        color: #f8fafc;
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
+      .card {
+        background: #1e293b;
+        padding: 24px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      h2 {
+        margin-top: 0;
+        color: #38bdf8;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2>Skuad Utama eFootball</h2>
+      <p><strong>Manajer:</strong> <span id="manajer">Memuat...</span></p>
+      <p><strong>Formasi:</strong> <span id="formasi">Memuat...</span></p>
+      <p><strong>Pemain Kunci:</strong></p>
+      <ul id="pemain"></ul>
+    </div>
+
+    <script>
+      fetch("/skuad")
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("manajer").textContent = data.manajer;
+          document.getElementById("formasi").textContent = data.formasi;
+          const list = document.getElementById("pemain");
+          data.pemainKunci.forEach((nama) => {
+            const li = document.createElement("li");
+            li.textContent = nama;
+            list.appendChild(li);
+          });
+        });
+    </script>
+  </body>
+</html>
