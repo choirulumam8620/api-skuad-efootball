@@ -33,6 +33,15 @@ app.get("/skuad", (req, res) => {
   res.json(skuad);
 });
 
+app.put("/skuad", (req, res) => {
+  const { manajer, formasi } = req.body;
+  const skuad = bacaSkuad();
+  if (manajer && manajer.trim() !== "") skuad.manajer = manajer.trim();
+  if (formasi && formasi.trim() !== "") skuad.formasi = formasi.trim();
+  simpanSkuad(skuad);
+  res.json({ pesan: "Info skuad berhasil diperbarui", skuad });
+});
+
 app.post("/pemain", (req, res) => {
   const { nama } = req.body;
   if (!nama || nama.trim() === "") {

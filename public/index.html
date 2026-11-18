@@ -21,9 +21,36 @@
         max-width: 400px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
       h2 {
-        margin-top: 0;
+        margin: 0;
         color: #38bdf8;
+      }
+      .btn-edit {
+        background: #334155;
+        color: #f8fafc;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .btn-edit:hover {
+        background: #475569;
+      }
+      #form-edit {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        background: #0f172a;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
       }
       ul {
         list-style: none;
@@ -51,7 +78,7 @@
       .btn-hapus:hover {
         background: #dc2626;
       }
-      form {
+      #form-pemain {
         display: flex;
         gap: 8px;
       }
@@ -79,9 +106,32 @@
   </head>
   <body>
     <div class="card">
-      <h2>Skuad Utama eFootball</h2>
+      <div class="header">
+        <h2>Skuad Utama eFootball</h2>
+        <button type="button" class="btn-edit" id="btn-toggle-edit">
+          Edit Info
+        </button>
+      </div>
+
       <p><strong>Manajer:</strong> <span id="manajer">Memuat...</span></p>
       <p><strong>Formasi:</strong> <span id="formasi">Memuat...</span></p>
+
+      <form id="form-edit">
+        <input
+          type="text"
+          id="input-manajer"
+          placeholder="Nama manajer..."
+          required
+        />
+        <input
+          type="text"
+          id="input-formasi"
+          placeholder="Formasi (misal: 4-2-1-3)..."
+          required
+        />
+        <button type="submit">Simpan Perubahan</button>
+      </form>
+
       <p><strong>Pemain Kunci:</strong></p>
       <ul id="pemain"></ul>
 
@@ -103,6 +153,9 @@
           .then((data) => {
             document.getElementById("manajer").textContent = data.manajer;
             document.getElementById("formasi").textContent = data.formasi;
+            document.getElementById("input-manajer").value = data.manajer;
+            document.getElementById("input-formasi").value = data.formasi;
+
             const list = document.getElementById("pemain");
             list.innerHTML = "";
             data.pemainKunci.forEach((nama) => {
@@ -122,6 +175,33 @@
             });
           });
       }
+
+      document
+        .getElementById("btn-toggle-edit")
+        .addEventListener("click", () => {
+          const formEdit = document.getElementById("form-edit");
+          formEdit.style.display =
+            formEdit.style.display === "flex" ? "none" : "flex";
+        });
+
+      document
+        .getElementById("form-edit")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          fetch("/skuad", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              manajer: document.getElementById("input-manajer").value,
+              formasi: document.getElementById("input-formasi").value,
+            }),
+          }).then((res) => {
+            if (res.ok) {
+              document.getElementById("form-edit").style.display = "none";
+              muatSkuad();
+            }
+          });
+        });
 
       function hapusPemain(nama) {
         fetch(`/pemain/${encodeURIComponent(nama)}`, {
