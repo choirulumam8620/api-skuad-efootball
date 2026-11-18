@@ -26,11 +26,30 @@
         color: #38bdf8;
       }
       ul {
-        padding-left: 20px;
+        list-style: none;
+        padding-left: 0;
         margin-bottom: 20px;
       }
       li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #0f172a;
+        padding: 8px 12px;
+        border-radius: 6px;
         margin: 8px 0;
+      }
+      .btn-hapus {
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .btn-hapus:hover {
+        background: #dc2626;
       }
       form {
         display: flex;
@@ -44,7 +63,7 @@
         background: #0f172a;
         color: #f8fafc;
       }
-      button {
+      button[type="submit"] {
         padding: 10px 16px;
         border: none;
         border-radius: 6px;
@@ -53,7 +72,7 @@
         font-weight: bold;
         cursor: pointer;
       }
-      button:hover {
+      button[type="submit"]:hover {
         background: #7dd3fc;
       }
     </style>
@@ -88,10 +107,28 @@
             list.innerHTML = "";
             data.pemainKunci.forEach((nama) => {
               const li = document.createElement("li");
-              li.textContent = nama;
+
+              const span = document.createElement("span");
+              span.textContent = nama;
+
+              const btn = document.createElement("button");
+              btn.textContent = "Hapus";
+              btn.className = "btn-hapus";
+              btn.onclick = () => hapusPemain(nama);
+
+              li.appendChild(span);
+              li.appendChild(btn);
               list.appendChild(li);
             });
           });
+      }
+
+      function hapusPemain(nama) {
+        fetch(`/pemain/${encodeURIComponent(nama)}`, {
+          method: "DELETE",
+        }).then((res) => {
+          if (res.ok) muatSkuad();
+        });
       }
 
       document

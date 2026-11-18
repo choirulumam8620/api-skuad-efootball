@@ -44,6 +44,14 @@ app.post("/pemain", (req, res) => {
   res.status(201).json({ pesan: "Pemain berhasil disimpan", skuad });
 });
 
+app.delete("/pemain/:nama", (req, res) => {
+  const namaHapus = req.params.nama;
+  const skuad = bacaSkuad();
+  skuad.pemainKunci = skuad.pemainKunci.filter((nama) => nama !== namaHapus);
+  simpanSkuad(skuad);
+  res.json({ pesan: "Pemain berhasil dihapus", skuad });
+});
+
 app.listen(PORT, () => {
   console.log(`Server berjalan di http://localhost:${PORT}`);
 });
